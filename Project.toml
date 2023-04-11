@@ -1,0 +1,4 @@
+name = "locationGenerator"
+uuid = "50cc3e3c-5398-4dee-a588-36d91900d3a7"
+authors = ["Alessandro Floris <floris.alessandro99@gmail.com>"]
+version = "0.1.0"
