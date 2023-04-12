@@ -51,8 +51,14 @@ end
 generated_points = collect(points_set)
 
 """
-    Generate in a random way n_points from the 
-    road netword of the input map
+    generate_points(map::MapData, n_points::Int)
+
+Generate in a random way 'n_points' from the 
+road network of the input map.
+
+    Genero randomicamente N punti all'interno della rete stradale. 
+    TODO: Sarebbe più corretto generare questi punti all'interno 
+    della mappa?
 """
 function generate_points(map::MapData, n_points::Int) 
 
@@ -68,13 +74,18 @@ function generate_points(map::MapData, n_points::Int)
     end
     
     return collect(points_set)
-
 end
 
-# Genero randomicamente N punti all'interno della rete stradale. 
-# TODO: Sarebbe più corretto generare questi punti all'interno 
-# della mappa?
 generated_points = generate_points(map, 5)
+
+# Genero la matrice delle distanze dei punti generati
+for node1 in generated_points
+    for node2 in generated_points
+        sr, distance, time = shortest_route(map, node1, node2)
+    end
+end
+
+#= +++++++++++++++++
 
 # Visualizziamo i punti generati all'interno della mappa
 
@@ -92,3 +103,5 @@ display(p)
 
 # Aspetta un new line prima di chiudere il processo
 readline()
+
+++++++++++++++ =#
