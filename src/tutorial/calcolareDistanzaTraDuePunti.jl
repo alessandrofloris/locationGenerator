@@ -1,6 +1,4 @@
 using OpenStreetMapX
-using OpenStreetMapXPlot
-using Plots
 
 # TODO: far inserire da linea di comando il path del file .osm da processare.
 # Il file dovrà stare nella dir "data". 
@@ -34,11 +32,4 @@ println("$node2 -> $node2_cord")
 # - il tempo di percorrenza (in secondi)
 sr, distance, time = shortest_route(map, node1, node2)
 
-Plots.gr()
-p = OpenStreetMapXPlot.plotmap(map,width=600,height=400)
-OpenStreetMapXPlot.addroute!(p, map.nodes, sr; route_color="red")
-OpenStreetMapXPlot.plot_nodes!(p,map,[sr[1],sr[end]],start_numbering_from=nothing,fontsize=13,color="pink")
-
-display(p)
-
-readline()
+println("Distance: $distance, Time: $time")

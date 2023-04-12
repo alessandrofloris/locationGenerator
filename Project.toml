@@ -4,4 +4,5 @@ authors = ["Alessandro Floris <floris.alessandro99@gmail.com>"]
 version = "0.1.0"
 
 [deps]
-StableRNGs = "860ef19b-820b-49d6-a774-d7a799459cd3"
+GR = "28b8d3ca-fb5f-59d9-8090-bfdbd6d07a71"
+OpenStreetMapXPlot = "d3d4fdd0-c191-11e8-3358-a3629b56487d"
