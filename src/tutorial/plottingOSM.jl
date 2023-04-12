@@ -34,12 +34,20 @@ println("$node2 -> $node2_cord")
 # - il tempo di percorrenza (in secondi)
 sr, distance, time = shortest_route(map, node1, node2)
 
-# Specifico il backend che voglio utilizzare per la visualizzazione del plot
+# Specifico il backend (BE) che voglio utilizzare per la visualizzazione del plot
 Plots.gr()
 
+# Crea il plot delle strade data una certa mappa
 p = OpenStreetMapXPlot.plotmap(map,width=600,height=400)
+
+# Aggiunge un tragitto a un plot
 OpenStreetMapXPlot.addroute!(p, map.nodes, sr; route_color="red")
 
+# Semplicemente associa un identificativo al nodo di partenza e a quello di 
+# destinazione, in questo caso le assegna gli id gestiti dall file OSM
+OpenStreetMapXPlot.plot_nodes!(p,map,[sr[1],sr[end]],start_numbering_from=nothing,fontsize=13,color="pink")
+
+# Chiama il BE per mostrare il plot
 display(p)
 
 readline()
