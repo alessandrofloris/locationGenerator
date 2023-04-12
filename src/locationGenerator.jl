@@ -34,12 +34,3 @@ println("$node2 -> $node2_cord")
 # - il tempo di percorrenza (in secondi)
 sr, distance, time = shortest_route(map, node1, node2)
 
-# Specifico il backend che voglio utilizzare per la visualizzazione del plot
-Plots.gr()
-
-p = OpenStreetMapXPlot.plotmap(map,width=600,height=400)
-OpenStreetMapXPlot.addroute!(p, map.nodes, sr; route_color="red")
-
-display(p)
-
-readline()
