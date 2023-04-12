@@ -43,11 +43,11 @@ p = OpenStreetMapXPlot.plotmap(map,width=600,height=400)
 # Aggiunge un tragitto a un plot
 OpenStreetMapXPlot.addroute!(p, map.nodes, sr; route_color="red")
 
-# Semplicemente associa un identificativo al nodo di partenza e a quello di 
-# destinazione, in questo caso le assegna gli id gestiti dall file OSM
+# Aggiunge al plot dei punti (nodi)
 OpenStreetMapXPlot.plot_nodes!(p,map,[sr[1],sr[end]],start_numbering_from=nothing,fontsize=13,color="pink")
 
 # Chiama il BE per mostrare il plot
 display(p)
 
+# Aspetta un new line prima di chiudere il processo
 readline()
