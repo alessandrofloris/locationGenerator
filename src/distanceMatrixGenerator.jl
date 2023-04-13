@@ -1,23 +1,16 @@
 """
-    result_type(dist, Ta::Type, Tb::Type) -> T
-    result_type(dist, a, b) -> T
+    _pairwise!(r::AbstractMatrix, metric::Function, a::Vector{Int64}, map::MapData)
 
-Infer the result type of metric `dist` with input types `Ta` and `Tb`, or element types
-of iterators `a` and `b`.
+Calc the distance matrix of a vector `a` according to the function `metric` and 
+stores it in the `r` matrix.
 """
-result_type(dist, a, b) = result_type(dist, _eltype(a), _eltype(b))
-result_type(f, a::Type, b::Type) = typeof(f(oneunit(a), oneunit(b))) # don't require `PreMetric` subtyping
-
-function _pairwise!(r::AbstractMatrix, metric::SemiMetric, a)
-   
+function _pairwise!(r::AbstractMatrix, metric::Function, a::Vector{Int64}, map::MapData)
     n = length(a)
-   
     size(r) == (n, n) || throw(DimensionMismatch("Incorrect size of r."))
-   
     @inbounds for (j, aj) in enumerate(a), (i, ai) in enumerate(a)
-
         r[i, j] = if i > j
-            metric(ai, aj)
+            sr, distance, time = metric(map, ai, aj)
+            distance
         # Quando i == j si sta cercando di calcolare la distanza tra un punto del vettore
         # e se stesso, dunque questa distanza è sicuramente zero
         elseif i == j 
@@ -28,19 +21,17 @@ function _pairwise!(r::AbstractMatrix, metric::SemiMetric, a)
             r[j, i]
         end
     end
-   
     r
-
 end
 
 """
-    pairwise(metric::PreMetric, a)
+    pairwise(metric::Function, a::Vector{Int64}, map::MapData)
 
-Calc the distance matrix of a vector 'a' according to the function 'metric'
+Calc the distance matrix of a vector `a` according to the function `metric`
 """
-function pairwise(metric, a)
+function pairwise(metric::Function, a::Vector{Int64}, map::MapData)
     n = length(a)
-    r = Matrix{result_type(metric, a, a)}(undef, n, n)
-    _pairwise!(r, metric, a)
+    r = Matrix{Float64}(undef,n, n)
+    _pairwise!(r, metric, a, map)
     return r
 end

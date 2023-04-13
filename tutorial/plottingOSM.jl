@@ -45,6 +45,7 @@ OpenStreetMapXPlot.addroute!(p, map.nodes, sr; route_color="red")
 
 # Aggiunge al plot dei punti (nodi)
 OpenStreetMapXPlot.plot_nodes!(p,map,[sr[1],sr[end]],start_numbering_from=nothing,fontsize=13,color="pink")
+#OpenStreetMapXPlot.plot_nodes_as_symbols!(p, map, sr, symbols="*")
 
 # Chiama il BE per mostrare il plot
 display(p)
