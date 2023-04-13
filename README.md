@@ -1,8 +1,8 @@
-# locationGenerator
+# LocationGenerator
 
-Dato un file OSM che contiene delle informazioni spaziali riguardo una certa zona 
-geografica si occupa di creare una matrice delle distanze e una serie di punti (utilizzando
-il p-median algorithm).
+Dato un file OSM contenente le informazioni spaziali di una certa zona geografica calcola 
+un cluster di potenziali clienti e un insieme di punti di pick up (utilizzando l'algoritmo 
+di Maranzano per la risoluzione del p-problem)
 
 Per la gestione dei dati spaziali utilizziamo OpenStreetMapX.
 Per la visualizzazione dei punti e delle rotte utilizziamo OpenStreetMapXPlot e Plots (con GR come BE).
