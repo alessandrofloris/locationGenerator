@@ -1,3 +1,9 @@
+module DistanceMatrix
+
+using OpenStreetMapX
+
+export pairwise
+
 """
     _pairwise!(r::AbstractMatrix, metric::Function, a::Vector{Int64}, map::MapData)
 
@@ -34,4 +40,6 @@ function pairwise(metric::Function, a::Vector{Int64}, map::MapData)
     r = Matrix{Float64}(undef,n, n)
     _pairwise!(r, metric, a, map)
     return r
+end
+
 end
