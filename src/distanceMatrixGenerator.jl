@@ -1,55 +1,46 @@
 """
-    pairwise!(r::AbstractMatrix, metric::PreMetric,
-              a::AbstractMatrix, b::AbstractMatrix=a; dims)
-Compute distances between each pair of rows (if `dims=1`) or columns (if `dims=2`)
-in `a` and `b` according to distance `metric`, and store the result in `r`.
-If a single matrix `a` is provided, compute distances between its rows or columns.
-`a` and `b` must have the same numbers of columns if `dims=1`, or of rows if `dims=2`.
-`r` must be a matrix with size `size(a, dims) × size(b, dims)`.
+    result_type(dist, Ta::Type, Tb::Type) -> T
+    result_type(dist, a, b) -> T
 
+Infer the result type of metric `dist` with input types `Ta` and `Tb`, or element types
+of iterators `a` and `b`.
 """
-# Noi dobbiamo passare come dims sempre 2 (il numero di righe deve matchare)
-function pairwise!(r::AbstractMatrix, metric::PreMetric,
-                   a::AbstractMatrix, b::AbstractMatrix;
-                   dims::Union{Nothing,Integer}=nothing)
-    
-    dims = deprecated_dims(dims)
-    dims in (1, 2) || throw(ArgumentError("dims should be 1 or 2 (got $dims)"))
-    
-    if dims == 1
-        na, ma = size(a) # size() -> n_rows, n_cols
-        nb, mb = size(b)
-        ma == mb || throw(DimensionMismatch("The numbers of columns in a and b " *
-                                            "must match (got $ma and $mb)."))
-    else
-        ma, na = size(a)
-        mb, nb = size(b)
-        ma == mb || throw(DimensionMismatch("The numbers of rows in a and b " *
-                                            "must match (got $ma and $mb)."))
-    end
+result_type(dist, a, b) = result_type(dist, _eltype(a), _eltype(b))
+result_type(f, a::Type, b::Type) = typeof(f(oneunit(a), oneunit(b))) # don't require `PreMetric` subtyping
 
-    size(r) == (na, nb) ||
-        throw(DimensionMismatch("Incorrect size of r (got $(size(r)), expected $((na, nb)))."))
-    
-    if dims == 1
-        _pairwise!(r, metric, permutedims(a), permutedims(b))
-    else
-        _pairwise!(r, metric, a, b)
+function _pairwise!(r::AbstractMatrix, metric::SemiMetric, a)
+   
+    n = length(a)
+   
+    size(r) == (n, n) || throw(DimensionMismatch("Incorrect size of r."))
+   
+    @inbounds for (j, aj) in enumerate(a), (i, ai) in enumerate(a)
+
+        r[i, j] = if i > j
+            metric(ai, aj)
+        # Quando i == j si sta cercando di calcolare la distanza tra un punto del vettore
+        # e se stesso, dunque questa distanza è sicuramente zero
+        elseif i == j 
+            zero(eltype(r))
+        # Se i < j significa che tutte le distanze tra le possibili
+        # coppie sono state calcolate
+        else
+            r[j, i]
+        end
     end
+   
+    r
 
 end
 
-function _pairwise!(r::AbstractMatrix, metric::PreMetric,
-    a::AbstractMatrix, b::AbstractMatrix=a)
-    require_one_based_indexing(r, a, b)
-    na = size(a, 2)
-    nb = size(b, 2)
-    size(r) == (na, nb) || throw(DimensionMismatch("Incorrect size of r."))
-    @inbounds for j = 1:size(b, 2)
-    bj = view(b, :, j)
-    for i = 1:size(a, 2)
-    r[i, j] = metric(view(a, :, i), bj)
-    end
-    end
-    r
+"""
+    pairwise(metric::PreMetric, a)
+
+Calc the distance matrix of a vector 'a' according to the function 'metric'
+"""
+function pairwise(metric, a)
+    n = length(a)
+    r = Matrix{result_type(metric, a, a)}(undef, n, n)
+    _pairwise!(r, metric, a)
+    return r
 end
