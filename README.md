@@ -12,5 +12,5 @@ Per la visualizzazione dei punti e delle rotte utilizziamo OpenStreetMapXPlot e 
 - [X] Dato un file OSM trasformarlo in un grafo stradale
 - [X] Prendere due nodi random che fanno parte del grafo e calcolare lo shortest path tra i due 
 - [X] Disegnare la route tra due nodi
-- [ ] Calcolare la matrice delle distanze
+- [X] Calcolare la matrice delle distanze
 - [ ] Utilizzare l'algoritmo di Maranzana per calcolare le p-mediane
