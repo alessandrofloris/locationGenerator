@@ -2,8 +2,12 @@ module Utils
 
 using OpenStreetMapX
 
+include("DistanceMatrix.jl")
+
 export generate_points
 export calc_sources
+export centre_of_gravity
+
 
 """
     generate_points(map::MapData, n_points::Int)
@@ -48,14 +52,35 @@ function get_number_of_points_to_generate()
 end
 
 """
-    calc_centre_of_gravity(nodes::Vector{Int64})
-Determines a centre of gravity for the set of point 
-passed to the function
+    centre_of_gravity(points::Vector{Int64}, map::MapData) 
+Determines a centre of gravity for a cluster of points
 
-@Return\n 
-Returns the id of the node that is the centre of gravity
+@Return the point that is the centre of gravity of the cluster
 """
-function calc_centre_of_gravity(nodes::Vector{Int64}) 
+function centre_of_gravity(points::Vector{Int64}, map::MapData) 
+    
+    current_centre_of_gravity = 0
+    current_centre_of_gravity_cost = Base.Inf
+
+    for point in points
+    
+        dm = DistanceMatrix.distance_matrix(OpenStreetMapX.shortest_route, point, points, map)
+
+        cost = sum(+, dm)
+        
+        if cost < current_centre_of_gravity_cost
+            current_centre_of_gravity = point
+            current_centre_of_gravity_cost = cost
+        end
+    
+    end
+
+    # TODO: dovremmo lanciare un eccezzione se current_center_of_gravity rimane 0
+    # E' una situazione che accade spesso, ed è provocata dalla presenza di 
+    # una distanza tra i punti che vale infinito.
+    # Quello che bisogna fare è capire quando la metrica resitiusce Inf 
+    # per la distanza di due punti, e poi vedere come procedere
+    return current_centre_of_gravity
 
 end
 

@@ -18,5 +18,3 @@ generated_points = Utils.generate_points(map, number_of_points_to_generate)
 
 # Calcolo la matrice delle distanze dei punti generati
 distance_matrix = DistanceMatrix.pairwise(OpenStreetMapX.shortest_route, generated_points, map)
-
-println(distance_matrix)
