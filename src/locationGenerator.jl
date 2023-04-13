@@ -13,7 +13,8 @@ map_path = (@__DIR__) * "/../data/cagliariMap.osm"
 map = get_map_data(map_path) 
 
 # Genero dei punti random all'interno della rete stradale
-generated_points = Utils.generate_points(map, 5)
+number_of_points_to_generate = Utils.get_number_of_points_to_generate()
+generated_points = Utils.generate_points(map, number_of_points_to_generate)
 
 # Calcolo la matrice delle distanze dei punti generati
 distance_matrix = DistanceMatrix.pairwise(OpenStreetMapX.shortest_route, generated_points, map)

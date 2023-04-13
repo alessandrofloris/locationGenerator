@@ -30,4 +30,20 @@ function generate_points(map::MapData, n_points::Int)
     return collect(points_set)
 end
 
+"""
+    get_number_of_points_to_generate()
+Reads a configuration file and return the value 
+that specifies the number of points to be generated
+"""
+function get_number_of_points_to_generate()
+    n = 0
+    conf_path = (@__DIR__) * "/../conf/conf"
+    open(conf_path) do io
+        line = readline(io)
+        conf = split(line, " ")
+        n = parse(Int, conf[2])
+    end
+    return n
+end
+
 end
