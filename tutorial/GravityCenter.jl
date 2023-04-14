@@ -2,7 +2,6 @@ using OpenStreetMapX
 using OpenStreetMapXPlot
 using Plots
 
-include("../src/DistanceMatrix.jl")
 include("../src/Utils.jl")
 
 map_path = (@__DIR__) * "/../data/cagliariMap.osm"

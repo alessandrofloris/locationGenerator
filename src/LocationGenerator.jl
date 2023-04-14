@@ -20,9 +20,9 @@ number_of_points_to_generate = Utils.get_number_of_points_to_generate()
 generated_points = Utils.generate_points(map, number_of_points_to_generate)
 
 # Calcolo la matrice delle distanze dei punti generati
-distance_matrix = DistanceMatrix.pairwise(OpenStreetMapX.shortest_route, generated_points, map)
+dm = DistanceMatrix.distance_matrix(OpenStreetMapX.shortest_route, generated_points, map)
 
-# Calcoliamo i punti migliori per i punti di ricarico
+# Calcoliamo i nodi migliori per i punti di ricarico
 number_of_sources = Utils.get_number_of_sources()
 partitions = Utils.calc_sources(number_of_sources, generated_points, map)
 

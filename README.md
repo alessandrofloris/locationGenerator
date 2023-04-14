@@ -14,6 +14,8 @@ Per la visualizzazione dei punti e delle rotte utilizziamo OpenStreetMapXPlot e 
 
 - [ ] Migliorare gestione del file di configurazione 
 - [ ] Gestire il caso in cui la distanza tra due punti sia Inf
+        - Questo caso si verifica quando si cerca di calcolare la distanza tra due 
+        vertici non collegati da un arco
 - [ ] L'algoritmo di partizionamento non sta funzionando bene
 
 ## Futuri sviluppi

@@ -3,7 +3,6 @@ using OpenStreetMapXPlot
 using Plots
 import Random
 
-include("../src/DistanceMatrix.jl")
 include("../src/Utils.jl")
 
 # TODO: far inserire da linea di comando il path del file .osm da processare.
