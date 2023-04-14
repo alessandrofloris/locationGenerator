@@ -1,7 +1,6 @@
 using OpenStreetMapX
 using OpenStreetMapXPlot
 using Plots
-import Random
 
 include("DistanceMatrix.jl")
 include("Utils.jl")
@@ -26,11 +25,8 @@ dm = DistanceMatrix.distance_matrix(OpenStreetMapX.shortest_route, generated_poi
 number_of_sources = Utils.get_number_of_sources()
 partitions = Utils.calc_sources(number_of_sources, generated_points, map)
 
-# Specifico il backend (BE) che voglio utilizzare per la visualizzazione del plot
-Plots.gr()
-
 # Crea il plot delle strade data una certa mappa
-p = OpenStreetMapXPlot.plotmap(map,width=600,height=400)
+p = plotmap(map,width=600,height=400)
 
 # Vogliamo assegnare un colore specifico ad ogni sottocluster
 col = ["green", "red", "blue", "black", "orange"]
@@ -39,8 +35,8 @@ col = ["green", "red", "blue", "black", "orange"]
 i = 1
 for (key, value) in partitions
     median = Vector{Int64}([key])  
-    OpenStreetMapXPlot.plot_nodes_as_symbols!(p, map, median, symbols="x", fontsize=15, colors=col[i])
-    OpenStreetMapXPlot.plot_nodes_as_symbols!(p, map, value, symbols="o", fontsize=10, colors=col[i])
+    plot_nodes_as_symbols!(p, map, median, symbols="x", fontsize=15, colors=col[i])
+    plot_nodes_as_symbols!(p, map, value, symbols="o", fontsize=10, colors=col[i])
     global i = i + 1
 end
 

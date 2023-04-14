@@ -20,7 +20,4 @@ Per la visualizzazione dei punti e delle rotte utilizziamo OpenStreetMapXPlot e 
 
 ## Futuri sviluppi
 
-- In questo momento i nodi cliente vengono generati in maniera totalmente randomica all'interno del grafo.
-        Un possibile sviluppo futuro sarebbe quello di utilizzare diverse distribuzioni per la 
-        genereazione di questi punti.
-- Usare distribuzioni per la domanda dei clienti
+- Usare distribuzioni per calcolare la domanda dei clienti
