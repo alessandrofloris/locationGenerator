@@ -53,6 +53,23 @@ function get_number_of_points_to_generate()
 end
 
 """
+    get_number_of_sources()
+Reads a configuration file and return the value 
+that specifies the number of requested sources 
+"""
+function get_number_of_sources()
+    n = 0
+    conf_path = (@__DIR__) * "/../conf/conf"
+    open(conf_path) do io
+        readline(io) # scartiamo la prima riga
+        line = readline(io)
+        conf = split(line, " ")
+        n = parse(Int, conf[2])
+    end
+    return n
+end
+
+"""
     centre_of_gravity(points::Vector{Int64}, map::MapData) 
 Determines a centre of gravity for a cluster of points
 
@@ -84,7 +101,13 @@ function centre_of_gravity(points::Vector{Int64}, map::MapData)
     return current_centre_of_gravity
 
 end
+"""
+    partition(sources::Vector{Int64}, nodes::Vector{Int64}, map::MapData)
+Calculates a partition of the cluster based on the sources points
 
+@Return a dictionary where the keys are the medians of the sub cluster, and the value are the points
+of the sub cluster 
+"""
 function partition(sources::Vector{Int64}, nodes::Vector{Int64}, map::MapData)
 
     partition = Dict{Int64, Vector{Int64}}()
@@ -106,6 +129,7 @@ function partition(sources::Vector{Int64}, nodes::Vector{Int64}, map::MapData)
         # TODO: da rimuovere
         if index_source != 0
             push!(partition[index_source], point) # aggiungere una gestione delle eccezzioni nel caso l'indice sia 0
+            println(index_source)
         end
     end
 
@@ -113,13 +137,12 @@ function partition(sources::Vector{Int64}, nodes::Vector{Int64}, map::MapData)
 end
 
 """
-    calc_sources(number_of_sources::Int, nodes::Vector{Int64})
+    calc_sources(number_of_sources::Int, nodes::Vector{Int64}, map::MapData)
 Calculate `m` sources (pick up points), and their
 respective partitions given a set `p` of points in a network
 
 @Return\n
-`sources = Vector{Int64}` (conterra l'id dei nodi)\n
-`partitions = Matrix{Int64}` (ogni riga contiene l'id dei sink serviti da un source) 
+`partitions = Dict{Int64, Vector{Int64}}` dove la chiave è la mediana del sotto cluster, e il valore è il sotto cluster 
 """
 function calc_sources(number_of_sources::Int, nodes::Vector{Int64}, map::MapData)
     
@@ -136,16 +159,47 @@ function calc_sources(number_of_sources::Int, nodes::Vector{Int64}, map::MapData
     #Step 2
         # Per ogni valore di pxi determinare la corrispondente partizione
         # a partire dall'insieme dei nodi, quindi ottenenedo Px1, ..., Pxm
-    
-    partitions = partition(sources, nodes)
 
-    #Step 3
-        # Determinare un centro di gravita cx per ogni partizione Pxi
+    partition_ = Dict{Int64, Vector{Int64}}()
 
-    #Step 4
-        # Se cxi = pxi per ogni i, la computazione viene interrota, e i valori correnti
-        # di pxi e Pxi costituiscono la soluzione desiderata
-        # Se cxi != pxi, allora setta pxi = cxi e riparti dallo step 2
+    while true
+        partition_ = partition(sources, nodes, map)
+        println(partition_)
+        #Step 3
+            # Determinare un centro di gravita cx per ogni partizione Pxi
+
+        medians = Dict{Int64, Int64}()
+        for (key,value) in partition_
+            medians[key] = key
+        end
+
+        for (key, value) in partition_
+            medians[key] = centre_of_gravity(value, map)
+        end
+
+        #Step 4
+            # Se cxi = pxi per ogni i, la computazione viene interrota, e i valori correnti
+            # di pxi e Pxi costituiscono la soluzione desiderata
+            # Se cxi != pxi, allora setta pxi = cxi e riparti dallo step 2
+
+        solution_found = true 
+
+        for (i, key_value) in enumerate(medians)
+            if key_value[1] != key_value[2] 
+                solution_found = false
+                sources[i] = key_value[2]
+            else 
+                sources[i] = key_value[1]
+            end
+        end
+
+        if solution_found
+            break
+        end
+    end
+
+    return partition_
+
 end
 
 end

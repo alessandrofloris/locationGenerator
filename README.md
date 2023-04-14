@@ -7,19 +7,21 @@ di Maranzano per la risoluzione del p-problem)
 Per la gestione dei dati spaziali utilizziamo OpenStreetMapX.
 Per la visualizzazione dei punti e delle rotte utilizziamo OpenStreetMapXPlot e Plots (con GR come BE).
 
-## Cose da fare 
+![alt text](https://github.com/alessandrofloris/locationGenerator/blob/main/example.png?raw=true)
 
-- [X] Dato un file OSM trasformarlo in un grafo stradale
-- [X] Prendere due nodi random che fanno parte del grafo e calcolare lo shortest path tra i due 
-- [X] Disegnare la route tra due nodi
-- [X] Calcolare la matrice delle distanze
-- [ ] Utilizzare l'algoritmo di Maranzana per calcolare le p-mediane
+
+## Bug e features
+
+- [ ] Migliorare gestione del file di configurazione 
+- [ ] Gestire il caso in cui la distanza tra due punti sia Inf
+- [ ] L'algoritmo di partizionamento non sta funzionando bene
 
 ## Futuri sviluppi
 
-In questo momento i nodi cliente vengono generati in maniera totalmente randomica all'interno del grafo.
-Un possibile sviluppo futuro sarebbe quello di utilizzare diverse distribuzioni per la 
-genereazione di questi punti.
+- In questo momento i nodi cliente vengono generati in maniera totalmente randomica all'interno del grafo.
+        Un possibile sviluppo futuro sarebbe quello di utilizzare diverse distribuzioni per la 
+        genereazione di questi punti.
+- Usare distribuzioni per la domanda dei clienti
 
 ## Algoritmo di Maranzana
 

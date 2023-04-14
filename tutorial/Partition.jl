@@ -36,7 +36,7 @@ col = ["green", "red", "blue", "black", "orange"]
 # Aggiunge al plot dei punti (nodi)
 for (key, value) in partition
     Random.seed!(key)
-    a = rand(1:6)
+    a = rand(1:5)
     median = Vector{Int64}([key])  
     OpenStreetMapXPlot.plot_nodes_as_symbols!(p, map, median, symbols="x", fontsize=15, colors=col[a])
     OpenStreetMapXPlot.plot_nodes_as_symbols!(p, map, value, symbols="o", fontsize=10, colors=col[a])
