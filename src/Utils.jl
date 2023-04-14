@@ -6,7 +6,8 @@ include("DistanceMatrix.jl")
 
 export generate_points
 export calc_sources
-export centre_of_gravity
+export centre_of_gravity # TODO: da rimuovere
+export partition # TODO: da rimuovere
 
 
 """
@@ -84,6 +85,33 @@ function centre_of_gravity(points::Vector{Int64}, map::MapData)
 
 end
 
+function partition(sources::Vector{Int64}, nodes::Vector{Int64}, map::MapData)
+
+    partition = Dict{Int64, Vector{Int64}}()
+    for v in sources
+        partition[v] = Vector{Int64}()
+    end
+
+    for point in nodes 
+        min_distance = Base.Inf
+        index_source = 0
+        for source in sources
+            sr, distance, time = shortest_route(map, point, source) # dovrei calcolare la distanza tra il point e la source o viceversa?
+            distance = distance
+            if distance < min_distance
+                min_distance = distance
+                index_source = source
+            end
+        end
+        # TODO: da rimuovere
+        if index_source != 0
+            push!(partition[index_source], point) # aggiungere una gestione delle eccezzioni nel caso l'indice sia 0
+        end
+    end
+
+    return partition
+end
+
 """
     calc_sources(number_of_sources::Int, nodes::Vector{Int64})
 Calculate `m` sources (pick up points), and their
@@ -93,18 +121,24 @@ respective partitions given a set `p` of points in a network
 `sources = Vector{Int64}` (conterra l'id dei nodi)\n
 `partitions = Matrix{Int64}` (ogni riga contiene l'id dei sink serviti da un source) 
 """
-function calc_sources(number_of_sources::Int, nodes::Vector{Int64})
+function calc_sources(number_of_sources::Int, nodes::Vector{Int64}, map::MapData)
     
+    # Eseguire un controllo sul numero richiesto di sources e il numero di nodi
+
     # Implementazione dell'algoritmo di Maranzana
 
     #Step 1 
         # Seleziona in maniera arbitraria m punti dall'insieme dei nodi,
         # e assegna questi m punti a una array pxi
 
+    sources = nodes[1:number_of_sources]
+
     #Step 2
         # Per ogni valore di pxi determinare la corrispondente partizione
         # a partire dall'insieme dei nodi, quindi ottenenedo Px1, ..., Pxm
     
+    partitions = partition(sources, nodes)
+
     #Step 3
         # Determinare un centro di gravita cx per ogni partizione Pxi
 
