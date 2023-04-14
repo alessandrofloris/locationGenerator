@@ -7,7 +7,7 @@ di Maranzano per la risoluzione del p-problem)
 Per la gestione dei dati spaziali utilizziamo OpenStreetMapX.
 Per la visualizzazione dei punti e delle rotte utilizziamo OpenStreetMapXPlot e Plots (con GR come BE).
 
-![alt text](https://github.com/alessandrofloris/locationGenerator/blob/main/example.png?raw=true)
+![example](https://github.com/alessandrofloris/locationGenerator/blob/main/img/example.png?raw=true)
 
 
 ## Bug e features
