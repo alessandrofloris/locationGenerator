@@ -4,15 +4,12 @@ using OpenStreetMapX
 
 include("DistanceMatrix.jl")
 
+export get_number_of_points_to_generate
+export get_number_of_sources
 export generate_points
 export calc_sources
-export centre_of_gravity # TODO: da rimuovere
-export partition # TODO: da rimuovere
-
 
 """
-    generate_points(map::MapData, n_points::Int)
-
 Generate in a random way `n_points` from the 
 road network of the input map.
  
@@ -37,7 +34,6 @@ function generate_points(map::MapData, n_points::Int)
 end
 
 """
-    get_number_of_points_to_generate()
 Reads a configuration file and return the value 
 that specifies the number of points to be generated
 """
@@ -53,7 +49,6 @@ function get_number_of_points_to_generate()
 end
 
 """
-    get_number_of_sources()
 Reads a configuration file and return the value 
 that specifies the number of requested sources 
 """
@@ -70,56 +65,63 @@ function get_number_of_sources()
 end
 
 """
-    centre_of_gravity(points::Vector{Int64}, map::MapData) 
 Determines a centre of gravity for a cluster of points
 
-@Return the point that is the centre of gravity of the cluster
+@Return a point that is the center of gravity of the cluster in input
 """
-function centre_of_gravity(points::Vector{Int64}, map::MapData) 
+function centre_of_gravity(cluster::Vector{Int64}, map::MapData) 
     
-    current_centre_of_gravity = 0
-    current_centre_of_gravity_cost = Base.Inf
+    centre_of_gravity = 0
+    centre_of_gravity_cost = Base.Inf
 
-    for point in points
+    """
+        Se per caso esiste un punto che non è raggiungibile da 
+        tutti gli altri, allora non verra trovato nessun centro di gravità 
+        dunque il programma fallirà
+    """
+    for point in cluster
     
-        dm = DistanceMatrix.distance_matrix(OpenStreetMapX.shortest_route, point, points, map)
-
+        dm = DistanceMatrix.distance_matrix(OpenStreetMapX.shortest_route, point, cluster, map)
+        
         cost = sum(+, dm)
         
-        if cost < current_centre_of_gravity_cost
-            current_centre_of_gravity = point
-            current_centre_of_gravity_cost = cost
+        if cost < centre_of_gravity_cost
+            centre_of_gravity = point
+            centre_of_gravity_cost = cost
         end
     
     end
 
-    # TODO: dovremmo lanciare un eccezzione se current_center_of_gravity rimane 0
-    # E' una situazione che accade spesso, ed è provocata dalla presenza di 
-    # una distanza tra i punti che vale infinito.
-    # Quello che bisogna fare è capire quando la metrica resitiusce Inf 
-    # per la distanza di due punti, e poi vedere come procedere
-    return current_centre_of_gravity
-
+     return centre_of_gravity
 end
+
 """
-    partition(sources::Vector{Int64}, nodes::Vector{Int64}, map::MapData)
 Calculates a partition of the cluster based on the sources points
 
 @Return a dictionary where the keys are the medians of the sub cluster, and the value are the points
 of the sub cluster 
 """
-function partition(sources::Vector{Int64}, nodes::Vector{Int64}, map::MapData)
+function partition(sources::Vector{Int64}, cluster::Vector{Int64}, map::MapData)
 
     partition = Dict{Int64, Vector{Int64}}()
     for v in sources
         partition[v] = Vector{Int64}()
     end
 
-    for point in nodes 
+    """
+        Se esiste un punto che non è raggiungibile dagli altri nodi,
+        esso non può essere messo in nessuna partizione.
+
+        Una soluzione temporanea sarebbe quella di metterlo
+        nella partizione della source la cui distanza eucliedea 
+        è la minore (rimarrebbe comunque il problema nella matrice
+        delle distanze) 
+    """
+    for point in cluster 
         min_distance = Base.Inf
         index_source = 0
         for source in sources
-            sr, distance, time = shortest_route(map, point, source) # dovrei calcolare la distanza tra il point e la source o viceversa?
+            sr, distance, time = shortest_route(map, source, point)
             distance = distance
             if distance < min_distance
                 min_distance = distance
@@ -128,8 +130,7 @@ function partition(sources::Vector{Int64}, nodes::Vector{Int64}, map::MapData)
         end
         # TODO: da rimuovere
         if index_source != 0
-            push!(partition[index_source], point) # aggiungere una gestione delle eccezzioni nel caso l'indice sia 0
-            println(index_source)
+            push!(partition[index_source], point)
         end
     end
 
@@ -137,36 +138,21 @@ function partition(sources::Vector{Int64}, nodes::Vector{Int64}, map::MapData)
 end
 
 """
-    calc_sources(number_of_sources::Int, nodes::Vector{Int64}, map::MapData)
 Calculate `m` sources (pick up points), and their
-respective partitions given a set `p` of points in a network
+respective partitions given a set `p` of points in a network (maranzana algorithm implementation)
 
-@Return\n
-`partitions = Dict{Int64, Vector{Int64}}` dove la chiave è la mediana del sotto cluster, e il valore è il sotto cluster 
+@Return `partitions = Dict{Int64, Vector{Int64}}` dove la chiave è la mediana del sotto cluster, e il valore è il sotto cluster 
 """
-function calc_sources(number_of_sources::Int, nodes::Vector{Int64}, map::MapData)
+function calc_sources(number_of_sources::Int, cluster::Vector{Int64}, map::MapData)
     
     # Eseguire un controllo sul numero richiesto di sources e il numero di nodi
 
-    # Implementazione dell'algoritmo di Maranzana
-
-    #Step 1 
-        # Seleziona in maniera arbitraria m punti dall'insieme dei nodi,
-        # e assegna questi m punti a una array pxi
-
-    sources = nodes[1:number_of_sources]
-
-    #Step 2
-        # Per ogni valore di pxi determinare la corrispondente partizione
-        # a partire dall'insieme dei nodi, quindi ottenenedo Px1, ..., Pxm
+    sources = cluster[1:number_of_sources]
 
     partition_ = Dict{Int64, Vector{Int64}}()
 
     while true
-        partition_ = partition(sources, nodes, map)
-        println(partition_)
-        #Step 3
-            # Determinare un centro di gravita cx per ogni partizione Pxi
+        partition_ = partition(sources, cluster, map)
 
         medians = Dict{Int64, Int64}()
         for (key,value) in partition_
@@ -176,11 +162,6 @@ function calc_sources(number_of_sources::Int, nodes::Vector{Int64}, map::MapData
         for (key, value) in partition_
             medians[key] = centre_of_gravity(value, map)
         end
-
-        #Step 4
-            # Se cxi = pxi per ogni i, la computazione viene interrota, e i valori correnti
-            # di pxi e Pxi costituiscono la soluzione desiderata
-            # Se cxi != pxi, allora setta pxi = cxi e riparti dallo step 2
 
         solution_found = true 
 
@@ -199,7 +180,6 @@ function calc_sources(number_of_sources::Int, nodes::Vector{Int64}, map::MapData
     end
 
     return partition_
-
 end
 
 end
