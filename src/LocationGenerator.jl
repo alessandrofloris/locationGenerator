@@ -12,9 +12,11 @@ map_path = (@__DIR__) * "/../data/cagliariMap.osm"
 # Restituisce un oggetto di tipo MapData che contiene codificati tutti i dati contenuti 
 # nel file .osm.
 # Questo oggetto viene utilizzato per l'analisi dei dati spaziali.
+@info "Converting osm data to a graph..."
 map = get_map_data(map_path) 
 
 # Genero dei punti random all'interno della rete stradale
+@info "Generating points from the graph..."
 number_of_points_to_generate = Utils.get_number_of_points_to_generate()
 generated_points = Utils.generate_points(map, number_of_points_to_generate)
 
@@ -22,9 +24,39 @@ generated_points = Utils.generate_points(map, number_of_points_to_generate)
 dm = DistanceMatrix.distance_matrix(OpenStreetMapX.shortest_route, generated_points, map)
 
 # Calcoliamo i nodi migliori per i punti di ricarico
+@info "Calculating sink and sources points..."
 number_of_sources = Utils.get_number_of_sources()
 partitions = Utils.calc_sources(number_of_sources, generated_points, map)
 
+# Stampo in output le posizioni dei clienti (sink) e dei punti di pick up (sources)
+n_sources = length(partitions)
+
+@info "Writing in output..."
+output = (@__DIR__) * "/../data/out/output.txt"
+open(output, "w") do io
+
+    # number of sources 
+    write(io, "$n_sources\n")
+
+    # for each source
+    for (key,value) in partitions
+        coord = LLA(map.nodes[key], map.bounds)
+        write(io, "$(coord.lat),$(coord.lon)\n")
+        
+        # number of sinks
+        n_sinks = length(value)
+        write(io, "$n_sinks\n")
+
+        # for each sink served by the current source
+        for v in value
+            coord = LLA(map.nodes[v], map.bounds)
+            write(io, "$(coord.lat),$(coord.lon)\n")
+        end
+    end
+
+end
+
+#=
 # Crea il plot delle strade data una certa mappa
 p = plotmap(map,width=600,height=400)
 
@@ -45,3 +77,4 @@ display(p)
 
 # Aspetta un new line prima di chiudere il processo
 readline()
+=#

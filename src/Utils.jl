@@ -131,6 +131,8 @@ function partition(sources::Vector{Int64}, cluster::Vector{Int64}, map::MapData)
         # TODO: da rimuovere
         if index_source != 0
             push!(partition[index_source], point)
+        else 
+            @warn "Distanza infinita: $point"
         end
     end
 
@@ -177,6 +179,11 @@ function calc_sources(number_of_sources::Int, cluster::Vector{Int64}, map::MapDa
         if solution_found
             break
         end
+    end
+
+    # Elimino dalle partizioni il centro di gravità
+    for (key,value) in partition_
+        partition_[key] = filter(x -> x != key ,partition_[key])
     end
 
     return partition_

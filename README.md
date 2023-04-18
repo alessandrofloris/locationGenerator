@@ -9,14 +9,24 @@ Per la visualizzazione dei punti e delle rotte utilizziamo OpenStreetMapXPlot e 
 
 ![example](https://github.com/alessandrofloris/locationGenerator/blob/main/img/example.png?raw=true)
 
+Il programma restituisce in output un file cosi formattato:
+Numero di punti di pick up
+Per ogni punto di pick up 
+        lat,long 
+        Numero di clienti
+        Per ogni cliente
+                lat,lon 
 
 ## Bug e features
 
-- [ ] Migliorare gestione del file di configurazione 
+- [ ] Ci sono dei casi in cui l'algoritmo di partizionamento non sta funzionando bene
 - [ ] Gestire il caso in cui la distanza tra due punti sia Inf
         - Questo caso si verifica quando si cerca di calcolare la distanza tra due 
         vertici non collegati da un arco
-- [ ] L'algoritmo di partizionamento non sta funzionando bene
+- [ ] Ora calcolo una (sotto) matrice delle distanze ogni qual volta voglio calcolare il centro di gravita di un cluster,
+  quello che invece dovrei fare è creare una struttura dati che contenga una sola matrice delle distanze e le informazioni
+  ausiliarie che mi permettano di utilizzarla
+- [ ] Migliorare gestione del file di configurazione
 
 ## Futuri sviluppi
 
