@@ -8,6 +8,7 @@ export get_number_of_points_to_generate
 export get_number_of_sources
 export generate_points
 export calc_sources
+export offset_point
 
 """
 Generate in a random way `n_points` from the 
@@ -188,5 +189,24 @@ function calc_sources(number_of_sources::Int, cluster::Vector{Int64}, map::MapDa
 
     return partition_
 end
+
+
+
+"""
+Calculates a new point in the graph according to a starting point 
+and a given offset (N,W,E,S) 
+
+@Returns a new point in the graph  
+"""
+function offset_point(point, offset, map)
+    
+    # Usiamo la funzione di OpenStreetMapX nearest_node(map.nodes, node.ENU)
+    point_enu_ = map.nodes[point]
+    point_enu = OpenStreetMapX.ENU((point_enu_.east + offset.east), (point_enu_.north+offset.north), 0)
+    new_point = OpenStreetMapX.nearest_node(map.nodes, point_enu)
+
+    return new_point 
+
+end 
 
 end

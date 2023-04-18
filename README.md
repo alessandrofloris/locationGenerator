@@ -19,6 +19,7 @@ Per ogni punto di pick up
 
 ## Bug e features
 
+- [ ] Capire meglio il formato di coordinate ENU
 - [ ] Ci sono dei casi in cui l'algoritmo di partizionamento non sta funzionando bene
 - [ ] Gestire il caso in cui la distanza tra due punti sia Inf
         - Questo caso si verifica quando si cerca di calcolare la distanza tra due 

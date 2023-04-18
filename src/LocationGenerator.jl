@@ -26,8 +26,25 @@ dm = DistanceMatrix.distance_matrix(OpenStreetMapX.shortest_route, generated_poi
 # Calcoliamo i nodi migliori per i punti di ricarico
 @info "Calculating sink and sources points..."
 number_of_sources = Utils.get_number_of_sources()
-partitions = Utils.calc_sources(number_of_sources, generated_points, map)
+partitions_ = Utils.calc_sources(number_of_sources, generated_points, map)
 
+mutable struct Offset
+    east
+    north 
+end
+
+offset = Offset(-2000.3, 3000.1)
+
+partitions = Dict{Int64, Vector{Int64}}()
+
+for (key, value) in partitions_
+    new_key = Utils.offset_point(key, offset, map)
+    v = pop!(partitions_, key)
+    partitions[new_key] = v
+end
+
+#=
+"""
 # Stampo in output le posizioni dei clienti (sink) e dei punti di pick up (sources)
 n_sources = length(partitions)
 
@@ -55,9 +72,10 @@ open(output, "w") do io
     end
 
 end
+=#
 
-#=
 # Crea il plot delle strade data una certa mappa
+@info "Printing map"
 p = plotmap(map,width=600,height=400)
 
 # Vogliamo assegnare un colore specifico ad ogni sottocluster
@@ -67,7 +85,7 @@ col = ["green", "red", "blue", "black", "orange"]
 i = 1
 for (key, value) in partitions
     median = Vector{Int64}([key])  
-    plot_nodes_as_symbols!(p, map, median, symbols="x", fontsize=15, colors=col[i])
+    plot_nodes_as_symbols!(p, map, median, symbols="x", fontsize=10, colors=col[i])
     plot_nodes_as_symbols!(p, map, value, symbols="o", fontsize=10, colors=col[i])
     global i = i + 1
 end
@@ -77,4 +95,3 @@ display(p)
 
 # Aspetta un new line prima di chiudere il processo
 readline()
-=#
