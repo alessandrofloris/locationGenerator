@@ -4,6 +4,8 @@ using Plots
 
 include("DistanceMatrix.jl")
 include("Utils.jl")
+include("Types.jl")
+include("Conf.jl")
 
 # TODO: far inserire da linea di comando il path del file .osm da processare.
 # Il file dovrà stare nella dir "data". 
@@ -17,7 +19,7 @@ map = get_map_data(map_path)
 
 # Genero dei punti random all'interno della rete stradale
 @info "Generating points from the graph..."
-number_of_points_to_generate = Utils.get_number_of_points_to_generate()
+number_of_points_to_generate = Conf.get_number_of_points_to_generate()
 generated_points = Utils.generate_points(map, number_of_points_to_generate)
 
 # Calcolo la matrice delle distanze dei punti generati
@@ -25,18 +27,13 @@ dm = DistanceMatrix.distance_matrix(OpenStreetMapX.shortest_route, generated_poi
 
 # Calcoliamo i nodi migliori per i punti di ricarico
 @info "Calculating sink and sources points..."
-number_of_sources = Utils.get_number_of_sources()
+number_of_sources = Conf.get_number_of_sources()
 partitions_ = Utils.calc_sources(number_of_sources, generated_points, map)
-
-mutable struct Offset
-    east
-    north 
-end
-
-offset = Offset(-2000.3, 3000.1)
 
 partitions = Dict{Int64, Vector{Int64}}()
 
+# Applica un offset ai punti di ricarico (se specificato nel file di configurazione)
+offset = Conf.get_offset() 
 for (key, value) in partitions_
     new_key = Utils.offset_point(key, offset, map)
     v = pop!(partitions_, key)

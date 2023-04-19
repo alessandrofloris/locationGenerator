@@ -4,8 +4,6 @@ using OpenStreetMapX
 
 include("DistanceMatrix.jl")
 
-export get_number_of_points_to_generate
-export get_number_of_sources
 export generate_points
 export calc_sources
 export offset_point
@@ -32,37 +30,6 @@ function generate_points(map::MapData, n_points::Int)
     end
     
     return collect(points_set)
-end
-
-"""
-Reads a configuration file and return the value 
-that specifies the number of points to be generated
-"""
-function get_number_of_points_to_generate()
-    n = 0
-    conf_path = (@__DIR__) * "/../conf/conf"
-    open(conf_path) do io
-        line = readline(io)
-        conf = split(line, " ")
-        n = parse(Int, conf[2])
-    end
-    return n
-end
-
-"""
-Reads a configuration file and return the value 
-that specifies the number of requested sources 
-"""
-function get_number_of_sources()
-    n = 0
-    conf_path = (@__DIR__) * "/../conf/conf"
-    open(conf_path) do io
-        readline(io) # scartiamo la prima riga
-        line = readline(io)
-        conf = split(line, " ")
-        n = parse(Int, conf[2])
-    end
-    return n
 end
 
 """
