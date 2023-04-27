@@ -7,6 +7,7 @@ include("DistanceMatrix.jl")
 export generate_points
 export calc_sources
 export offset_point
+export find_not_reachable_nodes
 
 """
 Generate in a random way `n_points` from the 
@@ -175,5 +176,49 @@ function offset_point(point, offset, map)
     return new_point 
 
 end 
+
+"""
+Given a distance matrix and a vector that contains the points 
+used to create the dm, returns a vector of indexes.
+
+Those indexes indicate where not rechable nodes are in the 
+vectors that contains the points.
+
+@Returns a vector of indexes of the not reachable nodes
+"""
+function find_not_reachable_nodes(dm)
+
+    not_reachable_points = Vector{Int}()
+
+    n = size(dm,1)
+
+    for i in 1:n
+        inf_found = false
+        for j in 1:n
+            if dm[i,j] == Base.Inf
+                inf_found = true
+                break
+            end
+        end
+        if inf_found
+            push!(not_reachable_points,i)
+        end
+    end
+
+    return not_reachable_points
+end
+
+"""
+Genereta N points, where N is the lenght of the vector `not_reachable_points`,
+and replaces them in the `generated_points` vector
+"""
+function replace_not_reachable_points(not_reachable_nodes, generated_points, map)
+    n = length(not_reachable_nodes)
+    new_nodes = generate_points(map, n)
+    for i in 1:n
+        generated_points[not_reachable_nodes[i]] = new_nodes[i]
+    end
+    return generated_points
+end
 
 end

@@ -22,8 +22,40 @@ map = get_map_data(map_path)
 number_of_points_to_generate = Conf.get_number_of_points_to_generate()
 generated_points = Utils.generate_points(map, number_of_points_to_generate)
 
+nodes_ready = false
+
+while !nodes_ready
+
 # Calcolo la matrice delle distanze dei punti generati
-dm = DistanceMatrix.distance_matrix(OpenStreetMapX.shortest_route, generated_points, map)
+@info "generating distance matrix"
+global dm = DistanceMatrix.distance_matrix(OpenStreetMapX.shortest_route, generated_points, map)
+not_reachable_nodes = Utils.find_not_reachable_nodes(dm)
+global generated_points = Utils.replace_not_reachable_points(not_reachable_nodes, generated_points, map)
+
+println(not_reachable_nodes)
+
+if length(not_reachable_nodes) == 0
+    global nodes_ready = true
+end
+
+end
+
+#=dm_n = length(generated_points)
+
+# Stampo in output la matrice delle distanze
+output = (@__DIR__) * "/../data/out/dm.txt"
+open(output, "w") do io
+    write(io, "[\n")
+    for i in 1:dm_n
+        write(io,"[ ")
+        for j in 1:dm_n
+            write(io, "$(dm[i,j]) ")    
+        end
+        write(io,"]\n")
+    end
+    write(io,"]")
+end
+=#
 
 # Calcoliamo i nodi migliori per i punti di ricarico
 @info "Calculating sink and sources points..."
@@ -40,13 +72,16 @@ for (key, value) in partitions_
     partitions[new_key] = v
 end
 
-#=
-"""
 # Stampo in output le posizioni dei clienti (sink) e dei punti di pick up (sources)
 n_sources = length(partitions)
 
+n_sinks = 0
+for (key,value) in partitions
+    global n_sinks = n_sinks + length(value)
+end
+
 @info "Writing in output..."
-output = (@__DIR__) * "/../data/out/output.txt"
+output = (@__DIR__) * "/../data/out/locations.txt"
 open(output, "w") do io
 
     # number of sources 
@@ -56,21 +91,64 @@ open(output, "w") do io
     for (key,value) in partitions
         coord = LLA(map.nodes[key], map.bounds)
         write(io, "$(coord.lat),$(coord.lon)\n")
-        
-        # number of sinks
-        n_sinks = length(value)
-        write(io, "$n_sinks\n")
+    end
 
-        # for each sink served by the current source
-        for v in value
+    # number of sinks
+    write(io, "$n_sinks\n")  
+    
+    # for each sink
+    for (key,value) in partitions
+        for v in value 
             coord = LLA(map.nodes[v], map.bounds)
             write(io, "$(coord.lat),$(coord.lon)\n")
         end
     end
 
 end
-=#
 
+"""
+++++
+"""
+
+nodes = Vector{Int64}()
+
+# Aggiungo le sources
+for (key,value) in partitions
+    push!(nodes, key)
+end
+
+# Aggiungo i sink
+for (key,value) in partitions
+    for v in value
+        push!(nodes, v)
+    end
+end
+
+# Calcolo la matrice delle distanze dei punti generati
+@info "Calculating distance matrix"
+dm = DistanceMatrix.distance_matrix(OpenStreetMapX.shortest_route, nodes, map)
+
+dm_n = (n_sinks+n_sources)
+
+"""
+++++
+"""
+
+# Stampo in output la matrice delle distanze
+output = (@__DIR__) * "/../data/out/dm.txt"
+open(output, "w") do io
+    write(io, "[\n")
+    for i in 1:dm_n
+        write(io,"[ ")
+        for j in 1:dm_n
+            write(io, "$(dm[i,j]) ")    
+        end
+        write(io,"]\n")
+    end
+    write(io,"]")
+end
+
+#=
 # Crea il plot delle strade data una certa mappa
 @info "Printing map"
 p = plotmap(map,width=600,height=400)
@@ -92,3 +170,4 @@ display(p)
 
 # Aspetta un new line prima di chiudere il processo
 readline()
+=#

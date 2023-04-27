@@ -13,13 +13,17 @@ Il programma restituisce in output un file cosi formattato:
 Numero di punti di pick up
 Per ogni punto di pick up 
         lat,long 
-        Numero di clienti
-        Per ogni cliente
-                lat,lon 
+Numero di clienti
+Per ogni cliente
+        lat,lon 
+
+## Cose da fare domani
+
+- Trovare un modo per calcolare la matrice delle distanze una sola volta
+- 
 
 ## Bug e features
 
-- [ ] Capire meglio il formato di coordinate ENU
 - [ ] Ci sono dei casi in cui l'algoritmo di partizionamento non sta funzionando bene
 - [ ] Gestire il caso in cui la distanza tra due punti sia Inf
         - Questo caso si verifica quando si cerca di calcolare la distanza tra due 
@@ -31,4 +35,9 @@ Per ogni punto di pick up
 
 ## Futuri sviluppi
 
-- Usare distribuzioni per calcolare la domanda dei clienti
+- Fare in modo che i mezzi non partano tutti dallo stesso magazzino
+- Scoprire se è possibile differenziare i nodi che fanno parte di un centro urbano o meno
+        - I nodi possono essere serviti da determinati mezzi in base alla loro posizione
+        - Le finestre orarie dei clienti dipende dalla loro posizione
+- Fare in modo che i mezzi che partano da un magazzino di un certo cluster possano servire anche 
+  i clienti facenti parte di un altro cluster
